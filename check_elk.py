@@ -22,7 +22,6 @@ WARNING = 1
 CRITICAL = 2
 UNKNOWN = 3
 
-# Definizione degli argomenti
 def parse_args():
     parser = argparse.ArgumentParser(
         description="ELK Monitoring Nagios Plugin"
@@ -63,8 +62,6 @@ def parse_args():
 
 def check_elasticsearch(host, port, user, pwd, ssl_ignore):
 
-    #/_cluster/health e mappa green/yellow/red --> OK/WARNING/CRITICAL.
-
     url = f"https://{host}:{port}/_cluster/health"
     try:
         resp = requests.get(
@@ -76,7 +73,7 @@ def check_elasticsearch(host, port, user, pwd, ssl_ignore):
 
     if resp.status_code == 200:
         data = resp.json()
-        status = data.get("status")
+        status = data.get("status", "")
         nodes = data.get("number_of_nodes", "n.d.")
         if status == "green":
             return OK, f"OK - Elasticsearch cluster green ({nodes} nodi)"
@@ -93,8 +90,6 @@ def check_elasticsearch(host, port, user, pwd, ssl_ignore):
 
 
 def check_kibana(host, port, user, pwd, ssl_ignore):
-
-    #available/degraded/unavailable --> OK/WARNING/CRITICAL.
 
     url = f"http://{host}:{port}/api/status"
     try:
@@ -132,8 +127,6 @@ def check_kibana(host, port, user, pwd, ssl_ignore):
 
 
 def check_logstash(host, port, user, pwd, ssl_ignore):
-
-    #/_node/stats
     
     url = f"http://{host}:{port}/_node/stats"
     try:
@@ -160,6 +153,7 @@ def check_logstash(host, port, user, pwd, ssl_ignore):
 
 
 def main():
+    
     args = parse_args()
 
     if not args.user or not args.password:
