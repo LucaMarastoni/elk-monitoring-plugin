@@ -6,7 +6,7 @@ Questo repository contiene script Python per monitorare i servizi di un cluster 
 
 * **check\_elk.py**: plugin Nagios per verificare lo stato di Elasticsearch, Kibana e Logstash.
 * **test\_check\_elk.py**: suite di test basata su pytest per validare i comportamenti del plugin.
-* **docker\_elk\_setup.sh**: script Bash per avviare container Docker di Elasticsearch, Kibana e Logstash in una rete dedicata.
+* **start\_elk.sh**: script Bash per avviare container Docker di Elasticsearch, Kibana e Logstash in una rete dedicata.
 * **requirements.txt**: elenco delle dipendenze Python necessarie per eseguire gli script.
 
 ---
