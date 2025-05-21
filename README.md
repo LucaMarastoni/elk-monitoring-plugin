@@ -149,8 +149,8 @@ KB_PASS=changekb
 Rendere eseguibile lo script e lanciarlo:
 
 ```bash
-chmod +x docker_elk_setup.sh
-./docker_elk_setup.sh
+chmod +x start_elk.sh
+./start_elk.sh
 ```
 
 Lo script esegue le seguenti operazioni:
@@ -171,18 +171,3 @@ Lo script esegue le seguenti operazioni:
    Logstash:      http://localhost:9600
    ```
 
----
-
-## Contribuire
-
-1. Fork del repo
-2. Branch per feature o bugfix: `git checkout -b feature/x`
-3. Commit: `git commit -m "Descrizione modifica"`
-4. Push: `git push origin feature/x`
-5. Pull Request
-
----
-
-## Licenza
-
-Rilasciato sotto licenza MIT. Consultare `LICENSE` per dettagli.
