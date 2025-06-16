@@ -1,131 +1,107 @@
-## ELK Monitoring and Deployment Nagios Plugin
+# ELK Monitoring & Deployment — Nagios Plugin
 
-This repository contains Python scripts to monitor the services of an ELK cluster (Elasticsearch, Kibana, and Logstash), their automated tests with pytest, and a Bash script for quick deployment of Docker containers in a development or test environment.
+This repository provides tools to monitor and deploy an ELK (Elasticsearch, Logstash, Kibana) stack. It includes a Nagios-compatible Python plugin, an automated pytest test suite, and a Bash script for quick containerized deployment using Docker.
 
 ---
 
 ## Contents
 
-* **check\_elk.py**: A Nagios plugin to verify the status of Elasticsearch, Kibana, and Logstash.
-* **test\_check\_elk.py**: A pytest-based test suite to validate the plugin's behavior.
-* **docker\_elk\_setup.sh**: A Bash script to start Elasticsearch, Kibana, and Logstash Docker containers on a dedicated network.
-* **requirements.txt**: A list of Python dependencies required to run the scripts.
+- **`check_elk.py`**: Python Nagios plugin to monitor Elasticsearch, Kibana, and Logstash status.
+- **`test_check_elk.py`**: Pytest suite to verify plugin functionality.
+- **`docker_elk_setup.sh`**: Shell script for setting up the ELK stack in Docker containers.
+- **`requirements.txt`**: Python dependencies required for the plugin and tests.
 
 ---
 
-## Prerequisites
+## 🛠 Prerequisites
 
-* Python 3.6 or higher
-* `pip` for Python package management
-* Docker and Docker Compose installed
+- Python 3.6+
+- `pip`
+- Docker and Docker Compose
 
-### Python Dependencies
-
-Install all dependencies with:
+### Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
-```
-
-Or manually:
-
-```bash
+# or
 pip install requests python-dotenv pytest
 ```
 
 ---
 
-# 1. Nagios Plugin in Python (`check_elk.py`)
+## 1. Nagios Plugin (`check_elk.py`)
 
-## Configuration
+### Configuration
 
-Credentials and the ELK host can be provided via environment variables or command-line arguments.
+Use environment variables or CLI arguments to pass credentials and host settings.
 
 1. Create a `.env` file in the project root:
 
-   ```ini
-   ELK_HOST=elk.example.local
-   ELK_USER=username
-   ELK_PASS=password
-   ```
-
-2. (Optional) Default ports:
-
-   * Elasticsearch: `9200`
-   * Kibana: `5601`
-   * Logstash: `9600`
-
-   Alternatively, pass the `--port` parameter to the CLI.
-
-## Usage
-
-```text
-usage: check_elk.py [-h] -c {elasticsearch,kibana,logstash}
-                    [-i HOST] [-p PORT] [-u USER] [-w PASSWORD]
-                    [-l]
-
-ELK Monitoring Nagios Plugin
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -c, --check {elasticsearch,kibana,logstash}
-                        Service to check
-  -i, --host HOST       Service host or endpoint (default: localhost or
-                        ELK_HOST env)
-  -p, --port PORT       Service port (default: 9200/5601/9600)
-  -u, --user USER       Username for basic auth (default: ELK_USER env)
-  -w, --password PASSWORD
-                        Password for basic auth (default: ELK_PASS env)
-  -l, --ssl-ignore      Ignore SSL certificate errors (self-signed)
+```ini
+ELK_HOST=elk.example.local
+ELK_USER=username
+ELK_PASS=password
 ```
 
-### Examples
+Default ports (unless overridden via CLI):
 
-* Check Elasticsearch:
+- Elasticsearch: `9200`
+- Kibana: `5601`
+- Logstash: `9600`
+
+### Usage
+
+```bash
+usage: check_elk.py [-h] -c {elasticsearch,kibana,logstash}
+                    [-i HOST] [-p PORT] [-u USER] [-w PASSWORD] [-l]
+```
+
+#### Examples
+
+- Basic Elasticsearch check:
 
   ```bash
   python check_elk.py --check elasticsearch
   ```
 
-* Custom Kibana host:
+- Specify custom host for Kibana:
 
   ```bash
   python check_elk.py -c kibana -i kibana.example.local -p 5601
   ```
 
-* Logstash with SSL ignore:
+- Logstash check with SSL ignore:
 
   ```bash
-  python check_elk.py -c logstash -i logstash.local -p 9600 \
-      -u user -w pass -l
+  python check_elk.py -c logstash -i logstash.local -p 9600 -u user -w pass -l
   ```
 
-The plugin returns standard Nagios exit codes:
+Nagios standard exit codes:
 
-* `0` (OK)
-* `1` (WARNING)
-* `2` (CRITICAL)
-* `3` (UNKNOWN)
+- `0`: OK
+- `1`: WARNING
+- `2`: CRITICAL
+- `3`: UNKNOWN
 
 ---
 
-# 2. pytest Test Suite (`test_check_elk.py`)
+## 2. Test Suite (`test_check_elk.py`)
 
-The test suite covers:
+### What It Covers
 
-* Elasticsearch health states: `green`, `yellow`, `red`
-* Unexpected states and HTTP errors
-* Connection and authentication exceptions (401)
-* Kibana states: `available`, `degraded`, `unavailable`
-* Logstash pipeline count verification
+- Elasticsearch health: `green`, `yellow`, `red`
+- HTTP and state errors
+- Auth failures (401)
+- Kibana states: `available`, `degraded`, `unavailable`
+- Logstash pipeline count check
 
-## Running the Tests
+### Run Tests
 
 ```bash
 pytest -v
 ```
 
-With coverage report (if `pytest-cov` is installed):
+Or with coverage:
 
 ```bash
 pytest --cov=check_elk.py --cov-report=term-missing
@@ -133,54 +109,50 @@ pytest --cov=check_elk.py --cov-report=term-missing
 
 ---
 
-# 3. Docker Deployment Script (`docker_elk_setup.sh`)
+## 3. Docker Deployment (`docker_elk_setup.sh`)
 
-A Bash script to quickly spin up a full ELK stack in Docker.
+### Start Configuration
 
-## Configuration
-
-Create a `.env` file with these variables:
+Set environment variables in `.env`:
 
 ```ini
-# Credentials and passwords
 ES_PASS=changeme
 KB_USER=kibana_system_user
 KB_PASS=changekb
 ```
 
-## Usage
-
-Make the script executable and run it:
+### Run Script
 
 ```bash
 chmod +x docker_elk_setup.sh
 ./docker_elk_setup.sh
 ```
 
-The script will:
+This will:
 
-1. Load and export variables from `.env`.
-2. Create the `elk-net` Docker network.
+1. Load `.env` values.
+2. Create Docker network `elk-net`.
 3. Start containers:
+   - `elasticsearch-test` (port 9200)
+   - `kibana-test` (port 5601)
+   - `logstash-test` (port 9600)
+4. Wait for Elasticsearch to be ready.
+5. Auto-create Kibana user.
 
-   * `elasticsearch-test` (port 9200, single-node mode, password from `ES_PASS`)
-   * `kibana-test` (port 5601, connected to Elasticsearch, SSL ignore)
-   * `logstash-test` (port 9600)
-4. Wait for Elasticsearch to be ready and create a Kibana user via API.
-5. Print endpoints and credentials:
+#### Output
 
-   ```text
-   Elasticsearch: https://localhost:9200 (user: elastic / pass: $ES_PASS)
-   Kibana:        http://localhost:5601 (user: $KB_USER / pass: $KB_PASS)
-   Logstash:      http://localhost:9600
-   ```
+```text
+Elasticsearch: https://localhost:9200 (user: elastic / pass: $ES_PASS)
+Kibana:        http://localhost:5601 (user: $KB_USER / pass: $KB_PASS)
+Logstash:      http://localhost:9600
+```
 
 ---
 
 ## Contributing
 
-1. Fork this repository
-2. Create a feature branch: `git checkout -b feature/x`
-3. Commit changes: `git commit -m "Description of change"`
-4. Push to your branch: `git push origin feature/x`
+1. Fork the repo
+2. Create a new branch: `git checkout -b feature/my-feature`
+3. Commit changes: `git commit -m "Add my feature"`
+4. Push branch: `git push origin feature/my-feature`
 5. Open a Pull Request
