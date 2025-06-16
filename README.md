@@ -4,7 +4,7 @@ This repository provides a set of Python and Bash tools to monitor an ELK (Elast
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ``` markdown
 elk-monitoring-plugin/
@@ -29,7 +29,7 @@ elk-monitoring-plugin/
 
 ---
 
-## 🔧 Requirements
+## Requirements
 
 - Python 3.6+
 - pip
